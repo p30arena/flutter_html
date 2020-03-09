@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 @immutable
 class ImageProperties {
+  final String placeholder;
   final String semanticLabel;
   final bool excludeFromSemantics;
   final double width;
@@ -17,6 +18,7 @@ class ImageProperties {
   final double scale;
 
   const ImageProperties({
+    this.placeholder,
     this.scale = 1,
     this.semanticLabel,
     this.excludeFromSemantics = false,

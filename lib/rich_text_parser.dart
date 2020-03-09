@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:html/dom.dart' as dom;
@@ -788,7 +789,8 @@ class HtmlRichTextParser extends StatelessWidget {
                     },
                   ));
                 } else if (node.attributes['src'].startsWith('asset:')) {
-                  final assetPath = node.attributes['src'].replaceFirst('asset:', '');
+                  final assetPath =
+                      node.attributes['src'].replaceFirst('asset:', '');
                   precacheImage(
                     AssetImage(assetPath),
                     buildContext,
@@ -841,38 +843,38 @@ class HtmlRichTextParser extends StatelessWidget {
                     },
                   ));
                 } else {
-                  precacheImage(
-                    NetworkImage(node.attributes['src']),
-                    buildContext,
-                    onError: onImageError ?? (_, __) {},
-                  );
-                  parseContext.rootWidgetList.add(GestureDetector(
-                    child: Image.network(
-                      node.attributes['src'],
-                      frameBuilder: (context, child, frame, _) {
-                        if (node.attributes['alt'] != null && frame == null) {
-                          return BlockText(
-                            child: RichText(
-                              textAlign: TextAlign.center,
-                              text: TextSpan(
-                                text: node.attributes['alt'],
-                                style: nextContext.childStyle,
-                              ),
-                            ),
-                            shrinkToFit: shrinkToFit,
-                          );
-                        }
-                        if (frame != null) {
-                          return child;
-                        }
-                        return Container();
+                  if (node.attributes['src'].contains('cdn.yabco.ir')) {
+                    Widget placeholder;
+                    if (imageProperties.placeholder != null) {
+                      placeholder = Image.asset(
+                        imageProperties.placeholder,
+                        width: (width ?? -1) > 0 ? width : null,
+                        height: (height ?? -1) > 0 ? height : null,
+                        matchTextDirection:
+                            imageProperties?.matchTextDirection ?? false,
+                        filterQuality:
+                            imageProperties?.filterQuality ?? FilterQuality.low,
+                        alignment:
+                            imageProperties?.alignment ?? Alignment.center,
+                        colorBlendMode: imageProperties?.colorBlendMode,
+                        fit: imageProperties?.fit,
+                        color: imageProperties?.color,
+                        repeat: imageProperties?.repeat ?? ImageRepeat.noRepeat,
+                      );
+                    }
+
+                    parseContext.rootWidgetList.add(CachedNetworkImage(
+                      imageUrl: node.attributes['src'],
+                      placeholder: (context, url) {
+                        return placeholder;
+                      },
+                      errorWidget: (context, url, error) {
+                        return placeholder;
                       },
                       width: (width ?? -1) > 0 ? width : null,
                       height: (height ?? -1) > 0 ? height : null,
-                      scale: imageProperties?.scale ?? 1.0,
                       matchTextDirection:
                           imageProperties?.matchTextDirection ?? false,
-                      centerSlice: imageProperties?.centerSlice,
                       filterQuality:
                           imageProperties?.filterQuality ?? FilterQuality.low,
                       alignment: imageProperties?.alignment ?? Alignment.center,
@@ -880,18 +882,61 @@ class HtmlRichTextParser extends StatelessWidget {
                       fit: imageProperties?.fit,
                       color: imageProperties?.color,
                       repeat: imageProperties?.repeat ?? ImageRepeat.noRepeat,
-                      semanticLabel: imageProperties?.semanticLabel,
-                      excludeFromSemantics:
-                          (imageProperties?.semanticLabel == null)
-                              ? true
-                              : false,
-                    ),
-                    onTap: () {
-                      if (onImageTap != null) {
-                        onImageTap(node.attributes['src']);
-                      }
-                    },
-                  ));
+                    ));
+                  } else {
+                    precacheImage(
+                      NetworkImage(node.attributes['src']),
+                      buildContext,
+                      onError: onImageError ?? (_, __) {},
+                    );
+                    parseContext.rootWidgetList.add(GestureDetector(
+                      child: Image.network(
+                        node.attributes['src'],
+                        frameBuilder: (context, child, frame, _) {
+                          if (node.attributes['alt'] != null && frame == null) {
+                            return BlockText(
+                              child: RichText(
+                                textAlign: TextAlign.center,
+                                text: TextSpan(
+                                  text: node.attributes['alt'],
+                                  style: nextContext.childStyle,
+                                ),
+                              ),
+                              shrinkToFit: shrinkToFit,
+                            );
+                          }
+                          if (frame != null) {
+                            return child;
+                          }
+                          return Container();
+                        },
+                        width: (width ?? -1) > 0 ? width : null,
+                        height: (height ?? -1) > 0 ? height : null,
+                        scale: imageProperties?.scale ?? 1.0,
+                        matchTextDirection:
+                            imageProperties?.matchTextDirection ?? false,
+                        centerSlice: imageProperties?.centerSlice,
+                        filterQuality:
+                            imageProperties?.filterQuality ?? FilterQuality.low,
+                        alignment:
+                            imageProperties?.alignment ?? Alignment.center,
+                        colorBlendMode: imageProperties?.colorBlendMode,
+                        fit: imageProperties?.fit,
+                        color: imageProperties?.color,
+                        repeat: imageProperties?.repeat ?? ImageRepeat.noRepeat,
+                        semanticLabel: imageProperties?.semanticLabel,
+                        excludeFromSemantics:
+                            (imageProperties?.semanticLabel == null)
+                                ? true
+                                : false,
+                      ),
+                      onTap: () {
+                        if (onImageTap != null) {
+                          onImageTap(node.attributes['src']);
+                        }
+                      },
+                    ));
+                  }
                 }
               }
             }

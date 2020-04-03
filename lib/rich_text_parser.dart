@@ -893,6 +893,8 @@ class HtmlRichTextParser extends StatelessWidget {
                             builder: (context) => ZoomableImage(
                               NetworkImage(node.attributes['src']),
                               backgroundColor: Colors.black,
+                              placeholder: const Center(
+                                  child: const CircularProgressIndicator()),
                             ),
                           );
                         },

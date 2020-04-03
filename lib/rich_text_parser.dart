@@ -889,14 +889,37 @@ class HtmlRichTextParser extends StatelessWidget {
                       img = GestureDetector(
                         onTap: () {
                           showDialog(
-                            context: buildContext,
-                            builder: (context) => ZoomableImage(
-                              NetworkImage(node.attributes['src']),
-                              backgroundColor: Colors.black,
-                              placeholder: const Center(
-                                  child: const CircularProgressIndicator()),
-                            ),
-                          );
+                              context: buildContext,
+                              builder: (context) => Stack(
+                                    alignment: Alignment.bottomCenter,
+                                    children: <Widget>[
+                                      ZoomableImage(
+                                        NetworkImage(node.attributes['src']),
+                                        backgroundColor: Colors.black,
+                                        placeholder: const Center(
+                                            child:
+                                                const CircularProgressIndicator()),
+                                      ),
+                                      Positioned(
+                                        bottom: 16,
+                                        child: MaterialButton(
+                                          shape: CircleBorder(),
+                                          color: Theme.of(context).primaryColor,
+                                          padding: EdgeInsets.all(16),
+                                          onPressed: () {
+                                            Navigator.of(
+                                              context,
+                                              rootNavigator: true,
+                                            ).pop();
+                                          },
+                                          child: Icon(
+                                            Icons.close,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ));
                         },
                         child: img,
                       );

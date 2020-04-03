@@ -7,6 +7,7 @@ import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart' as parser;
 
 import 'image_properties.dart';
+import 'zoomable_image.dart';
 
 typedef CustomRender = Widget Function(dom.Node node, List<Widget> children);
 typedef CustomTextStyle = TextStyle Function(
@@ -863,7 +864,7 @@ class HtmlRichTextParser extends StatelessWidget {
                       );
                     }
 
-                    parseContext.rootWidgetList.add(CachedNetworkImage(
+                    Widget img = CachedNetworkImage(
                       imageUrl: node.attributes['src'],
                       placeholder: (context, url) {
                         return placeholder;
@@ -882,7 +883,24 @@ class HtmlRichTextParser extends StatelessWidget {
                       fit: imageProperties?.fit,
                       color: imageProperties?.color,
                       repeat: imageProperties?.repeat ?? ImageRepeat.noRepeat,
-                    ));
+                    );
+
+                    if (imageProperties?.isZoomable == true) {
+                      img = GestureDetector(
+                        onTap: () {
+                          showDialog(
+                            context: buildContext,
+                            builder: (context) => ZoomableImage(
+                              NetworkImage(node.attributes['src']),
+                              backgroundColor: Colors.black,
+                            ),
+                          );
+                        },
+                        child: img,
+                      );
+                    }
+
+                    parseContext.rootWidgetList.add(img);
                   } else {
                     precacheImage(
                       NetworkImage(node.attributes['src']),

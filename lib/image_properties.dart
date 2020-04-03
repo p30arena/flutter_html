@@ -16,6 +16,7 @@ class ImageProperties {
   final bool matchTextDirection;
   final FilterQuality filterQuality;
   final double scale;
+  final bool isZoomable;
 
   const ImageProperties({
     this.placeholder,
@@ -32,5 +33,6 @@ class ImageProperties {
     this.centerSlice,
     this.matchTextDirection = false,
     this.filterQuality = FilterQuality.low,
+    this.isZoomable,
   });
 }
